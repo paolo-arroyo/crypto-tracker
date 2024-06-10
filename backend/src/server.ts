@@ -104,7 +104,7 @@ app.get('/api/tokens', async (req, res) => {
     const tokens = await fetchTokens(TOKENS);
    res.json(tokens);
   } catch (error) {
-    res.location('/error')
+    res.status(500).json({ error: 'Failed to fetch tokens' });
   }
 });
 
@@ -115,7 +115,7 @@ app.get('/api/:coin', async (req, res) => {
     const prices = await fetchPrices(coin, minutes);
     res.json(prices);
   } catch (error) {
-    res.location('/error')
+    res.status(500).json({ error: 'Failed to fetch prices' });
   }
 });
 
