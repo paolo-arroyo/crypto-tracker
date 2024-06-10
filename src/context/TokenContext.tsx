@@ -5,6 +5,7 @@ interface Token {
   id: string;
   name: string;
   symbol: string;
+  price: string;
 }
 
 interface TokenContextType {

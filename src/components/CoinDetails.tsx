@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTokenContext } from '../context/TokenContext';
+import { EURO } from '../constants/PriceFormat';
 
 type CoinDetailsProps = {
   coin: string;
@@ -22,8 +23,8 @@ const CoinDetails: React.FC<CoinDetailsProps> = ({ coin, data }) => {
         <p className="text-sm rounded-sm bg-purple-500 text-white uppercase px-4"> {token?.symbol} </p>
       </div>
       <p className="text-gray-600 text-sm mb-2"> {count} records shown. </p>
-      <p><strong>Latest Price:</strong> €{Number(latestPrice).toFixed(2)}</p>
-      <p><strong>Average Price:</strong> €{Number(averagePrice).toFixed(2)}</p>
+      <p><strong>Latest Price:</strong> {Intl.NumberFormat("en-US", EURO).format(Number(latestPrice))}</p>
+      <p className="text-sm text-gray-500">Average: {Intl.NumberFormat("en-US", EURO).format(Number(averagePrice))}</p>
     </div>
   );
 };
