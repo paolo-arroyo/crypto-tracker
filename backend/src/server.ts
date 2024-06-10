@@ -14,6 +14,7 @@ const app = express();
 const cache = new NodeCache({ stdTTL: 60 })
 
 app.use(cors());
+app.use(express.static(path.join(__dirname, '../../build')));
 
 const fetchTokens = async (coins: string[]) => {
   const cacheKey = 'tokens';
@@ -55,7 +56,7 @@ app.get('/api/tokens', async (req, res) => {
 });
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', '..', 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../../build', 'index.html'));
 });
 
 app.listen(PORT, () => {
