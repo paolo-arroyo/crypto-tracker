@@ -108,6 +108,17 @@ app.get('/api/tokens', async (req, res) => {
   }
 });
 
+app.get('/api/:coin', async (req, res) => {
+  try {
+    const { coin } = req.params;
+    const minutes = parseInt(req.query.minutes as string) || 60;
+    const prices = await fetchPrices(coin, minutes);
+    res.json(prices);
+  } catch (error) {
+    res.location('/error')
+  }
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../build', 'index.html'));
 });
