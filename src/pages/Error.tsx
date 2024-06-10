@@ -4,7 +4,7 @@ const ErrorPage = () => {
   const history = useNavigate();
 
   const handleBackClick = () => {
-    history(-1);
+    history(-2);
   };
 
   return (
