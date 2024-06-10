@@ -9,6 +9,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler
 } from 'chart.js';
 
 ChartJS.register(
@@ -18,7 +19,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 interface PriceChartProps {
@@ -26,12 +28,13 @@ interface PriceChartProps {
 }
 
 const PriceChart: React.FC<PriceChartProps> = ({ history }) => {
+  const reverse = [...history].reverse();
   const data = {
-    labels: history.map((point) => new Date(point.timestamp).toLocaleString()),
+    labels: reverse.map((point) => new Date(point.timestamp).toLocaleString()),
     datasets: [
       {
         label: 'Price',
-        data: history.map((point) => point.price),
+        data: reverse.map((point) => point.price),
         fill: true,
         borderColor: '#A855F7',
         tension: 0.1,
