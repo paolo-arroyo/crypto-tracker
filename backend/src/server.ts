@@ -46,6 +46,59 @@ const fetchTokens = async (coins: string[]) => {
   }
 }
 
+const fetchPrices = async (coin: string, minutes: number = 60) => {
+  const cacheKey = `prices_${coin}_${minutes}`;
+  const cachedData = cache.get(cacheKey);
+  if (cachedData) {
+    console.log('Returning cached price data');
+    return cachedData;
+  }
+  try {
+    const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${coin}/market_chart`, {
+      params: {
+        vs_currency: 'eur',
+        days: Math.ceil(minutes / (24 * 60)) // Convert minutes to days
+      }
+    });
+    const data = response.data.prices;
+    
+    // Calculate average price within the specified number of minutes
+    const now = Date.now();
+    const cutoffTime = now - (minutes * 60 * 1000);
+    let total = 0;
+    let count = 0;
+    let history = [];
+
+    for (let i = data.length - 1; i >= 0; i--) {
+      const [timestamp, price] = data[i];
+      if (timestamp >= cutoffTime) {
+        total += price;
+        count++;
+        history.push({ timestamp, price });
+      } else {
+        break;
+      }
+    }
+
+    const latestPrice = data[data.length - 1][1];
+    const averagePrice = count > 0 ? total / count : null;
+
+    const priceData = {
+      latestPrice,
+      averagePrice,
+      history,
+      count
+    };
+
+    cache.set(cacheKey, priceData);
+
+    return priceData;
+  } catch (error) {
+    console.error('Error fetching prices:', error);
+    throw new Error('Failed to fetch prices');
+  }
+};
+
 app.get('/api/tokens', async (req, res) => {
   try {
     const tokens = await fetchTokens(TOKENS);
