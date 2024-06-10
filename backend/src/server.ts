@@ -20,7 +20,7 @@ const fetchTokens = async (coins: string[]) => {
   const cacheKey = 'tokens';
   const cachedData = cache.get(cacheKey);
   if (cachedData) {
-    console.log('Returning cached data');
+    console.log('Returning cached token data');
     return cachedData;
   }
   try {
