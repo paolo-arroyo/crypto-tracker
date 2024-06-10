@@ -15,12 +15,12 @@ const TokenCard: React.FC<TokenCardProps> = ({ id, name, symbol, price }) => {
       <div className="bg-white shadow-md p-4 rounded-lg m-4 hover:text-white hover:shadow-lg hover:bg-purple-500">
         <h2 className="text-xl font-semibold flex flex-row justify-between items-center">
           {name}
-          <span className="font-normal text-xs text-purple-500">
+          <span className="font-normal text-sm text-purple-500">
             {Intl.NumberFormat("en-US", EURO).format(Number(price))}
           </span>
         </h2>
-        <p className="text-gray-700 text-sm">ID: {id}</p>
-        <p className="text-gray-700 text-sm">Symbol: <span className="uppercase">{symbol}</span></p>
+        <p className="text-gray-700 text-xs">ID: {id}</p>
+        <p className="text-gray-700 text-xs">Symbol: <span className="uppercase">{symbol}</span></p>
       </div>
     </Link>
   );
