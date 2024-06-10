@@ -40,6 +40,10 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
     };
 
     fetchTokens();
+
+    const intervalId = setInterval(fetchTokens, 60000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return (

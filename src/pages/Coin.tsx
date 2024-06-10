@@ -4,6 +4,7 @@ import axios from 'axios';
 import CoinDetails from '../components/CoinDetails';
 import PriceChart from '../components/PriceChart';
 import TimeSelector from '../components/TimeSelector';
+import debounce from '../helpers/debounce';
 
 const CoinDetailPage: React.FC = () => {
   const { coinId } = useParams<{ coinId: string }>();
@@ -13,7 +14,7 @@ const CoinDetailPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCoinData = async () => {
+    const debouncedFetchCoinData = debounce(async (coinId: string, minutes: string | null) => {
       try {
         const response = await axios.get(`/api/${coinId}?minutes=${minutes || 60}`);
         setCoinData(response.data);
@@ -21,10 +22,20 @@ const CoinDetailPage: React.FC = () => {
         console.error('Error fetching coin data:', error);
         navigate('/error');
       }
+    }, 300);
+
+    const fetchData = async () => {
+      if (coinId) {
+        debouncedFetchCoinData(coinId, minutes);
+      }
     };
 
-    fetchCoinData();
-  }, [coinId, navigate, minutes]);
+    fetchData();
+
+    const intervalId = setInterval(fetchData, 60000);
+
+    return () => clearInterval(intervalId);
+  }, [coinId, minutes, navigate]);
 
   if (!coinId) return null;
 
