@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import axios from 'axios';
 import CoinDetails from '../components/CoinDetails';
 import PriceChart from '../components/PriceChart';
+import TimeSelector from '../components/TimeSelector';
 
 const CoinDetailPage: React.FC = () => {
   const { coinId } = useParams<{ coinId: string }>();
@@ -35,6 +36,7 @@ const CoinDetailPage: React.FC = () => {
           {coinData ? <CoinDetails data={coinData} coin={coinId} /> : <p>Loading...</p>}
         </div>
         <div className="order-1 lg:order-2 w-full bg-purple-100 mt-8 p-6 rounded-md">
+          <TimeSelector />
           {coinData ? <PriceChart history={coinData.history} /> : <p>Loading...</p>}
         </div>
       </div>
