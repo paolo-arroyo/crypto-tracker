@@ -1,9 +1,11 @@
+// src/pages/Home.tsx
 import React from 'react';
+import TokenList from '../components/TokenList';
 
 const Home: React.FC = () => {
   return (
     <div>
-      HOMEPAGE
+      <TokenList />
     </div>
   );
 };
