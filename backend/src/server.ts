@@ -8,6 +8,7 @@ import axios from 'axios';
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
+const CG_API_KEY = process.env.CG_API_KEY;
 const TOKENS = ['bitcoin', 'ethereum', 'dogecoin'];
 
 const app = express();
@@ -16,7 +17,36 @@ const cache = new NodeCache({ stdTTL: 60 })
 app.use(cors());
 app.use(express.static(path.join(__dirname, '../../build')));
 
+const fetchSimplePrice = async(coins: string[]) => {
+  const cacheKey = 'simplePrices';
+  const cachedData = cache.get(cacheKey);
+  if (cachedData) {
+    console.log('Returning cached simple price data');
+    return cachedData;
+  }
+  try {
+    const response = await axios.get(`https://api.coingecko.com/api/v3/simple/price`, {
+      headers: {
+        'x-cg-demo-api-key': CG_API_KEY,
+      },
+      params: {
+        vs_currencies: 'eur',
+        ids: coins.join(','),
+      }
+    });
+
+    const tokenPrices = response.data;
+
+    cache.set(cacheKey, tokenPrices);
+    return tokenPrices;
+  } catch (error) {
+    console.error("Error fetching current prices:", error);
+    throw new Error('Failed to fetch current prices');
+  }
+}
+
 const fetchTokens = async (coins: string[]) => {
+  const prices = await fetchSimplePrice(TOKENS);
   const cacheKey = 'tokens';
   const cachedData = cache.get(cacheKey);
   if (cachedData) {
@@ -26,13 +56,19 @@ const fetchTokens = async (coins: string[]) => {
   try {
     const tokens = await Promise.all(coins.map((coin) => {
       return axios
-        .get(`https://api.coingecko.com/api/v3/coins/${coin}`)
+        .get(`https://api.coingecko.com/api/v3/coins/${coin}`, {
+          headers: {
+            'x-cg-demo-api-key': CG_API_KEY,
+          }
+        })
         .then((response) => {
           const { id, name, symbol } = response.data;
+          const price = prices[id].eur;
           return {
             id,
             name,
-            symbol
+            symbol,
+            price
           }
         })
     }));
@@ -58,6 +94,9 @@ const fetchPrices = async (coin: string, minutes: number = 60) => {
       params: {
         vs_currency: 'eur',
         days: Math.ceil(minutes / (24 * 60)) // Convert minutes to days
+      },
+      headers: {
+        'x-cg-demo-api-key': CG_API_KEY,
       }
     });
     const data = response.data.prices;
