@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import NodeCache from 'node-cache';
+import axios from 'axios';
 
 dotenv.config();
 
@@ -12,6 +13,36 @@ const app = express();
 const cache = new NodeCache({ stdTTL: 60 })
 
 app.use(cors());
+
+const fetchTokens = async (coins: string[]) => {
+  const cacheKey = 'tokens';
+  const cachedData = cache.get(cacheKey);
+  if (cachedData) {
+    console.log('Returning cached data');
+    return cachedData;
+  }
+  try {
+    const tokens = await Promise.all(coins.map((coin) => {
+      return axios
+        .get(`https://api.coingecko.com/api/v3/coins/${coin}`)
+        .then((response) => {
+          const { id, name, symbol } = response.data;
+          return {
+            id,
+            name,
+            symbol
+          }
+        })
+    }));
+
+    cache.set(cacheKey, tokens);
+
+    return tokens;
+  } catch (error) {
+    console.error("Error fetching tokens:", error);
+    throw new Error('Failed to fetch tokens');
+  }
+}
 
 
 
