@@ -8,6 +8,7 @@ import axios from 'axios';
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
+const TOKENS = ['bitcoin', 'ethereum', 'dogecoin'];
 
 const app = express();
 const cache = new NodeCache({ stdTTL: 60 })
@@ -44,7 +45,14 @@ const fetchTokens = async (coins: string[]) => {
   }
 }
 
-
+app.get('/api/tokens', async (req, res) => {
+  try {
+    const tokens = await fetchTokens(TOKENS);
+   res.json(tokens);
+  } catch (error) {
+    res.location('/error')
+  }
+});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', '..', 'build', 'index.html'));
